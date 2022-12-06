@@ -10,7 +10,7 @@
 #define F(i,a,b) for(int i = a; i < b; i++)
 using namespace std;
 
-void build(vector<pair<int,pair<int,int>>>& seg, int a[], int ind, int low, int high){
+void build(vector<pair<int,pair<int,int>>>& seg, string a, int ind, int low, int high){
     if(low == high){
         seg[ind].ff = 0;
         if(a[low] == '(')seg[ind].ss.ff = 1;
@@ -40,9 +40,43 @@ void build(vector<pair<int,pair<int,int>>>& seg, int a[], int ind, int low, int 
     seg[ind].ss.ss += seg[2*ind + 2].ss.ss;
 }
 
+int query(vector<pair<int,pair<int,int>>>& seg, int ind, int low, int high, int l, int r ){
+    if(high < l || low > r){
+        return INT_MAX;
+    }
+
+    if(l <= low && high <= r){
+        return seg[ind].ff;
+    }
+
+    int mid = low + ( high - low ) / 2;
+    int left = query(seg, 2*ind+1, low, mid, l, r);
+    int right = query(seg, 2*ind+2, mid+1, high, l, r);
+    return left + right;
+}
+
 void solve(){
-    
-    
+    string s;
+    cin>>s;
+    int n = s.size();
+    vector<pair<int,pair<int,int>>> seg(4*n+10);
+    F(i,0,4*n+10){
+        seg[i].ff = 0;
+        seg[i].ss.ff = 0;
+        seg[i].ss.ss = 0;
+    }
+
+    build(seg, s, 0, 0, n-1);
+
+    int q;
+    cin>>q;
+    while (q--)
+    {
+        int l,r;
+        cin>>l>>r;
+        l--;r--;
+        cout<<query(seg,0,0,n-1,l,r)<<endl;
+    }
 }
 
 int main(){
