@@ -10,9 +10,81 @@
 #define F(i,a,b) for(int i = a; i < b; i++)
 using namespace std;
 
+class SGTree{
+    vector<int> seg;
+    public:
+    SGTree(int n){
+        seg.resize(4*n+10);
+    }
+
+    void build(int a[], int ind, int low, int high){
+        if(low == high){
+            seg[ind] = a[low];
+            return;
+        }
+
+        int mid = (high + low) / 2;
+
+        build(a, 2*ind + 1, low, mid);
+        build(a, 2*ind + 2, mid+1, high);
+
+        seg[ind] = ( seg[2*ind + 1] + seg[2*ind + 2] );
+    }
+
+    int query(int ind, int low, int high, int l, int r ){
+        
+        if(high < l || low > r){
+            return 0;
+        }
+
+        if(l <= low && high <= r){
+            return seg[ind];
+        }
+
+        int mid = low + ( high - low ) / 2;
+        int left = query(2*ind+1, low, mid, l, r);
+        int right = query(2*ind+2, mid+1, high, l, r);
+        return (left + right);
+    }
+
+    void update(int ind, int low, int high, int i, int val){
+        if(low == high){
+            seg[ind] += val;
+            return;
+        }
+        int mid = ( low + high ) / 2;
+        if(i<=mid) update(2*ind+1, low, mid, i, val);
+        else update(2*ind + 2, mid + 1, high, i, val);
+
+        seg[ind] = ( seg[2*ind + 1] + seg[2*ind + 2] );
+    }
+
+};
+
 void solve(){
-    
-    
+    int n;
+    cin>>n;
+    int a[n];
+    int ans = 0;
+    int mx = -1;
+    F(i,0,n){
+        cin>>a[i];
+        mx = max(mx, a[i]);
+    }
+    mx++;
+    int freq[mx];
+    memset(freq,0,sizeof(freq));
+    F(i,0,n){
+        freq[a[i]]++;
+    }
+    SGTree sg(mx);
+    sg.build(a,0, 0, mx-1);
+    F(i,0,n){
+        freq[a[i]]--;
+        sg.update(0,0,mx-1,a[i],-1);
+        ans += sg.query(0,0,mx-1,1,a[i]-1);
+    }
+    cout<<ans<<endl;
 }
 
 int main(){
