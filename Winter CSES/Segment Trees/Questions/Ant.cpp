@@ -91,7 +91,6 @@ void solve(){
         int ans = 0;
         l--; r--;
         int rangeGcd = st.query(0,0,n-1,l,r);
-        // cout<<rangeGcd<<endl;
 
         if(!mp[rangeGcd].empty()) ans = upper_bound(mp[rangeGcd].begin(), mp[rangeGcd].end(), r) - lower_bound(mp[rangeGcd].begin(), mp[rangeGcd].end(), l);
         cout<<r-l+1-ans<<endl;
